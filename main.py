@@ -20,7 +20,7 @@ def base64_to_image(base64_str):
     img_data = base64.b64decode(base64_str)
     return Image.open(io.BytesIO(img_data))
 
-api_gateway_url = "https://tf10zezfri.execute-api.ap-southeast-2.amazonaws.com/test/processimage"
+api_gateway_url = "https://qm8r2a6gu6.execute-api.ap-southeast-2.amazonaws.com/samtest/samprocess"
 
 
 st.title("Image Upload and Resize Test Application")
