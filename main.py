@@ -4,6 +4,8 @@ from PIL import Image
 import base64
 import io
 
+api_gateway_url = "https://tf10zezfri.execute-api.ap-southeast-2.amazonaws.com/test/processimage"
+
 def resize_image(image, size=(256, 256)):
     return image.resize(size, Image.LANCZOS)
 
@@ -13,8 +15,9 @@ def image_to_base64(image):
     img_str = base64.b64encode(buffered.getvalue()).decode()
     return img_str
 
-# Replace the URL below with the Invoke URL from your API Gateway
-api_gateway_url = "https://tf10zezfri.execute-api.ap-southeast-2.amazonaws.com/test/processimage"
+def base64_to_image(base64_str):
+    img_data = base64.b64decode(base64_str)
+    return Image.open(io.BytesIO(img_data))
 
 def send_image_data_to_lambda(base64_image):
     response = requests.post(api_gateway_url, json={"image_data": base64_image})
@@ -41,5 +44,11 @@ if uploaded_file is not None:
     lambda_response = send_image_data_to_lambda(base64_resized_image)
     st.write("Lambda Response:")
     st.write(lambda_response)
+
+    if "base64_result_image" in lambda_response:
+        received_base64_image = lambda_response["base64_result_image"]
+        received_image = base64_to_image(received_base64_image)
+        st.write("Received Image from Lambda:")
+        st.image(received_image)
 else:
     st.write("No image file has been uploaded.")
