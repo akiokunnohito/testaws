@@ -3,6 +3,7 @@ import requests
 from PIL import Image
 import base64
 import io
+import json
 
 api_gateway_url = "https://tf10zezfri.execute-api.ap-southeast-2.amazonaws.com/test/processimage"
 
@@ -21,7 +22,9 @@ def base64_to_image(base64_str):
 
 def send_image_data_to_lambda(base64_image):
     response = requests.post(api_gateway_url, json={"image_data": base64_image})
-    return response.json()
+    response_json = response.json()
+    response_json["body"] = json.loads(response_json["body"])
+    return response_json
 
 st.title("Image Upload and Resize Test Application")
 
@@ -45,10 +48,11 @@ if uploaded_file is not None:
     st.write("Lambda Response:")
     st.write(lambda_response)
 
-    if "base64_result_image" in lambda_response:
-        received_base64_image = lambda_response["base64_result_image"]
+    if "base64_result_image" in lambda_response["body"]:
+        received_base64_image = lambda_response["body"]["base64_result_image"]
         received_image = base64_to_image(received_base64_image)
         st.write("Received Image from Lambda:")
         st.image(received_image)
+
 else:
     st.write("No image file has been uploaded.")
